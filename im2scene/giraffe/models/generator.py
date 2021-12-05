@@ -62,7 +62,33 @@ class Generator(nn.Module):
         self.use_max_composition = use_max_composition
 
         self.camera_matrix = get_camera_mat(fov=fov).to(device)
+        '''
+        self.encoder_app = nn.Sequential(
+            torch.nn.Linear(z_dim, z_dim*2),
+            torch.nn.ReLU(),
+            torch.nn.Linear(z_dim*2, z_dim),
+            torch.nn.ReLU(),
+        )
+        self.encoder_shape = nn.Sequential(
+            torch.nn.Linear(z_dim, z_dim*2),
+            torch.nn.ReLU(),
+            torch.nn.Linear(z_dim*2, z_dim),
+            torch.nn.ReLU(),
+        )
+        self.encoder_shape_bg = nn.Sequential(
+            torch.nn.Linear(z_dim_bg, z_dim_bg*2),
+            torch.nn.ReLU(),
+            torch.nn.Linear(z_dim_bg*2, z_dim_bg),
+            torch.nn.ReLU(),
+        )
 
+        self.encoder_app_bg = nn.Sequential(
+            torch.nn.Linear(z_dim_bg, z_dim_bg*2),
+            torch.nn.ReLU(),
+            torch.nn.Linear(z_dim_bg*2, z_dim_bg),
+            torch.nn.ReLU(),
+        )
+        '''
         if decoder is not None:
             self.decoder = decoder.to(device)
         else:
@@ -86,8 +112,12 @@ class Generator(nn.Module):
                 return_alpha_map=False,
                 not_render_background=False,
                 only_render_background=False):
+        #not_render_background=True        
+        #only_render_background=True   
         if latent_codes is None:
             latent_codes = self.get_latent_codes(batch_size)
+
+        #latent_codes = self.get_w_space(latent_codes)
 
         if camera_matrices is None:
             camera_matrices = self.get_random_camera(batch_size)
@@ -99,21 +129,34 @@ class Generator(nn.Module):
             bg_rotation = self.get_random_bg_rotation(batch_size)
 
         if return_alpha_map:
+            #print('calculating')
             rgb_v, alpha_map = self.volume_render_image(
                 latent_codes, camera_matrices, transformations, bg_rotation,
                 mode=mode, it=it, return_alpha_map=True,
                 not_render_background=not_render_background)
-            return alpha_map
+            #print('will return')
+            if self.neural_renderer is not None:
+                rgb = self.neural_renderer(rgb_v)
+            else:
+                rgb = rgb_v
+            return rgb,alpha_map
         else:
             rgb_v = self.volume_render_image(
                 latent_codes, camera_matrices, transformations, bg_rotation,
                 mode=mode, it=it, not_render_background=not_render_background,
                 only_render_background=only_render_background)
+            #print(rgb_v.shape)
             if self.neural_renderer is not None:
                 rgb = self.neural_renderer(rgb_v)
             else:
                 rgb = rgb_v
+            #print(rgb_v.shape,rgb.shape)
             return rgb
+
+    def freeze_neural_renderer(self):
+        for param in self.neural_renderer.parameters():
+            param.requires_grad = False
+
 
     def get_n_boxes(self):
         if self.bounding_box_generator is not None:
@@ -133,6 +176,13 @@ class Generator(nn.Module):
         z_shape_bg = sample_z((batch_size, z_dim_bg))
         z_app_bg = sample_z((batch_size, z_dim_bg))
 
+        return z_shape_obj, z_app_obj, z_shape_bg, z_app_bg
+
+    def get_w_space(self, latent_codes, batch_size=32): 
+
+        z_shape_obj, z_app_obj, z_shape_bg, z_app_bg = latent_codes
+        z_shape_bg, z_app_bg = self.encoder_shape_bg(z_shape_bg), self.encoder_app_bg(z_app_bg)
+        z_shape_obj, z_app_obj = self.encoder_shape(z_shape_obj), self.encoder_app(z_app_obj)
         return z_shape_obj, z_app_obj, z_shape_bg, z_app_bg
 
     def sample_z(self, size, to_device=True, tmp=1.):
@@ -387,6 +437,8 @@ class Generator(nn.Module):
                             it=0, return_alpha_map=False,
                             not_render_background=False,
                             only_render_background=False):
+        
+        # only_render_background=True
         res = self.resolution_vol
         device = self.device
         n_steps = self.n_ray_samples

@@ -15,6 +15,7 @@ def get_model(cfg, device=None, len_dataset=0, **kwargs):
     '''
     decoder = cfg['model']['decoder']
     discriminator = cfg['model']['discriminator']
+    discriminator2 = cfg['model']['discriminator']
     generator = cfg['model']['generator']
     background_generator = cfg['model']['background_generator']
     decoder_kwargs = cfg['model']['decoder_kwargs']
@@ -38,6 +39,9 @@ def get_model(cfg, device=None, len_dataset=0, **kwargs):
 
     if discriminator is not None:
         discriminator = discriminator_dict[discriminator](
+            img_size=img_size, **discriminator_kwargs)
+    if discriminator2 is not None:
+        discriminator2 = discriminator_dict[discriminator2](
             img_size=img_size, **discriminator_kwargs)
     if background_generator is not None:
         background_generator = \
@@ -66,13 +70,13 @@ def get_model(cfg, device=None, len_dataset=0, **kwargs):
 
     model = models.GIRAFFE(
         device=device,
-        discriminator=discriminator, generator=generator,
+        discriminator=discriminator,discriminator2=discriminator2, generator=generator,
         generator_test=generator_test,
     )
     return model
 
 
-def get_trainer(model, optimizer, optimizer_d, cfg, device, **kwargs):
+def get_trainer(model, optimizer, optimizer_d, cfg, device, DB, **kwargs):
     ''' Returns the trainer object.
 
     Args:
@@ -92,15 +96,24 @@ def get_trainer(model, optimizer, optimizer_d, cfg, device, **kwargs):
     fid_file = cfg['data']['fid_file']
     assert(fid_file is not None)
     fid_dict = np.load(fid_file)
-
-    trainer = training.Trainer(
-        model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
-        overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
-        fid_dict=fid_dict,
-        n_eval_iterations=n_eval_iterations,
-    )
+    if DB == 1:
+        trainer = training.Trainer(
+            model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
+            overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
+            fid_dict=fid_dict,
+            n_eval_iterations=n_eval_iterations,
+        )
+    else: 
+        trainer = training.Trainer2(
+            model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
+            overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
+            fid_dict=fid_dict,
+            n_eval_iterations=n_eval_iterations,
+        )
 
     return trainer
+
+
 
 
 def get_renderer(model, cfg, device, **kwargs):

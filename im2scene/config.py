@@ -93,7 +93,7 @@ def set_logger(cfg):
 
 
 # Trainer
-def get_trainer(model, optimizer, optimizer_d, cfg, device):
+def get_trainer(model, optimizer, optimizer_d, cfg, device,DB = 1):
     ''' Returns a trainer instance.
 
     Args:
@@ -103,11 +103,10 @@ def get_trainer(model, optimizer, optimizer_d, cfg, device):
         device (device): pytorch device
     '''
     method = cfg['method']
-    set_logger(cfg)
+    #set_logger(cfg)
     trainer = method_dict[method].config.get_trainer(
-        model, optimizer, optimizer_d, cfg, device)
+        model, optimizer, optimizer_d, cfg, device,DB)
     return trainer
-
 
 # Renderer
 def get_renderer(model, cfg, device):
@@ -135,6 +134,7 @@ def get_dataset(cfg, **kwargs):
     # Get fields with cfg
     dataset_name = cfg['data']['dataset_name']
     dataset_folder = cfg['data']['path']
+    dataset_folder2 = cfg['data']['path2']
     categories = cfg['data']['classes']
     img_size = cfg['data']['img_size']
 
@@ -144,10 +144,16 @@ def get_dataset(cfg, **kwargs):
                                  use_tanh_range=cfg['data']['use_tanh_range'],
                                  )
     else:
-        dataset = data.ImagesDataset(
+        dataset1 = data.ImagesDataset(
             dataset_folder, size=img_size,
             use_tanh_range=cfg['data']['use_tanh_range'],
             celebA_center_crop=cfg['data']['celebA_center_crop'],
             random_crop=cfg['data']['random_crop'],
         )
-    return dataset
+        dataset2 = data.ImagesDataset(
+            dataset_folder2, size=img_size,
+            use_tanh_range=cfg['data']['use_tanh_range'],
+            celebA_center_crop=cfg['data']['celebA_center_crop'],
+            random_crop=cfg['data']['random_crop'],
+        )
+    return [dataset1,dataset2]

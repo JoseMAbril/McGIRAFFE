@@ -32,7 +32,8 @@ class NeuralRenderer(nn.Module):
         self.use_rgb_skip = use_rgb_skip
         self.use_norm = use_norm
         n_blocks = int(log2(img_size) - 4)
-
+        #upsample_rgb="bilinear"
+        #upsample_feat="bilinear"
         assert(upsample_feat in ("nn", "bilinear"))
         if upsample_feat == "nn":
             self.upsample_2 = nn.Upsample(scale_factor=2.)
@@ -58,6 +59,14 @@ class NeuralRenderer(nn.Module):
                        max(n_feat // (2 ** (i + 2)), min_feat), 3, 1, 1)
                 for i in range(0, n_blocks - 1)]
         )
+
+        self.conv_layers2 = nn.ModuleList(
+            [nn.Conv2d(n_feat, n_feat // 2, 3, 1, 1)] +
+            [nn.Conv2d(max(n_feat // (2 ** (i + 1)), min_feat),
+                       max(n_feat // (2 ** (i + 2)), min_feat), 3, 1, 1)
+                for i in range(0, n_blocks - 1)]
+        )
+
         if use_rgb_skip:
             self.conv_rgb = nn.ModuleList(
                 [nn.Conv2d(input_dim, out_dim, 3, 1, 1)] +
@@ -87,12 +96,12 @@ class NeuralRenderer(nn.Module):
             if self.use_norm:
                 hid = self.norms[idx](hid)
             net = self.actvn(hid)
-
+            
             if self.use_rgb_skip:
                 rgb = rgb + self.conv_rgb[idx + 1](net)
                 if idx < len(self.conv_layers) - 1:
                     rgb = self.upsample_rgb(rgb)
-
+            
         if not self.use_rgb_skip:
             rgb = self.conv_rgb(net)
 

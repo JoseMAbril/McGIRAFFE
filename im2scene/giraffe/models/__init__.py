@@ -36,7 +36,7 @@ class GIRAFFE(nn.Module):
     '''
 
     def __init__(self, device=None,
-                 discriminator=None, generator=None, generator_test=None,
+                 discriminator=None,discriminator2=None, generator=None, generator_test=None,
                  **kwargs):
         super().__init__()
 
@@ -44,6 +44,10 @@ class GIRAFFE(nn.Module):
             self.discriminator = discriminator.to(device)
         else:
             self.discriminator = None
+        if discriminator2 is not None:
+            self.discriminator2 = discriminator2.to(device)
+        else:
+            self.discriminator2 = None
         if generator is not None:
             self.generator = generator.to(device)
         else:

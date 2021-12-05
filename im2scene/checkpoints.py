@@ -102,10 +102,14 @@ class CheckpointIO(object):
     '''
 
         for k, v in self.module_dict.items():
-            if k in state_dict:
-                v.load_state_dict(state_dict[k])
-            else:
-                print('Warning: Could not find %s in checkpoint!' % k)
+            try:
+                if k in state_dict:
+                    v.load_state_dict(state_dict[k])
+                else:
+                    print('Warning: Could not find %s in checkpoint!' % k)
+            except:
+                print(f'deprecated parameter: {k}')
+                continue
         scalars = {k: v for k, v in state_dict.items()
                    if k not in self.module_dict}
         return scalars

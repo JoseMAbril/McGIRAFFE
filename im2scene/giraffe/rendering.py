@@ -129,10 +129,10 @@ class Renderer(object):
 
         if n_boxes == 1:
             t = []
-            x_val = 0.5
+            x_val = 1
         elif n_boxes == 2:
             t = [[0.5, 0.5, 0.]]
-            x_val = 1.
+            x_val = 2.
 
         out = []
         for step in range(n_steps):
