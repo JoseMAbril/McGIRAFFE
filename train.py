@@ -52,17 +52,12 @@ else:
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
-train_dataset, train_dataset2 = config.get_dataset(cfg)
+train_dataset= config.get_dataset(cfg)
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=batch_size, num_workers=n_workers, shuffle=True,
     pin_memory=True, drop_last=True,
 )
-'''
-train_loader2 = torch.utils.data.DataLoader(
-    train_dataset2, batch_size=batch_size, num_workers=n_workers, shuffle=True,
-    pin_memory=True, drop_last=True,
-)
-'''
+
 model = config.get_model(cfg, device=device, len_dataset=len(train_dataset))
 
 
@@ -81,15 +76,8 @@ if hasattr(model, "discriminator") and model.discriminator is not None:
     optimizer_d = op(parameters_d, lr=lr_d)
 else:
     optimizer_d = None
-'''
-if hasattr(model, "discriminator2") and model.discriminator2 is not None:
-    parameters_d2 = model.discriminator2.parameters()
-    optimizer_d2 = op(parameters_d2, lr=lr_d)
-else:
-    optimizer_d2 = None
-'''
+
 trainer = config.get_trainer(model, optimizer, optimizer_d, cfg, device=device)
-#trainer2 = config.get_trainer(model, optimizer, optimizer_d2, cfg, device=device,DB = 2)
 checkpoint_io = CheckpointIO(out_dir, model=model, optimizer=optimizer,
                              optimizer_d=optimizer_d)
 
@@ -127,40 +115,17 @@ if hasattr(model, "discriminator") and model.discriminator is not None:
     nparameters_d = sum(p.numel() for p in model.discriminator.parameters())
     logger_py.info(
         'Total number of discriminator parameters: %d' % nparameters_d)
-'''
-if hasattr(model, "discriminator2") and model.discriminator2 is not None:
-    nparameters_d = sum(p.numel() for p in model.discriminator2.parameters())
-    logger_py.info(
-        'Total number of discriminator 2 parameters: %d' % nparameters_d)
-'''
+
 if hasattr(model, "generator") and model.generator is not None:
     nparameters_g = sum(p.numel() for p in model.generator.parameters())
     logger_py.info('Total number of generator parameters: %d' % nparameters_g)
 
 t0b = time.time()
-frozen = False
 while (True):
     epoch_it += 1
     
     for batch in train_loader:
-        '''
-        dataloader_iterator = iter(train_loader2)
-        
-        if it>10000 and not frozen:
-            print('congeladoS')
-            trainer.freeze_neural_renderer()
-            trainer2.freeze_neural_renderer()
-            frozen = True
-        
-        if it%1 == 0 and it>10000 and it<20000:
-            try:
-                batch2 = next(dataloader_iterator)
-            except StopIteration:
-                dataloader_iterator = iter(train_loader2)
-                batch2 = next(dataloader_iterator)
-            loss2 = trainer2.train_step(batch2, it)
-        '''
-        # print(batch['image'].size())
+
         it += 1
         loss = trainer.train_step(batch, it)
         for (k, v) in loss.items():
@@ -177,7 +142,6 @@ while (True):
         # # Visualize output
         if visualize_every > 0 and (it % visualize_every) == 0:
             logger_py.info('Visualizing')
-            #image_grid, x = trainer2.visualize(it=it)
             image_grid, x = trainer.visualize(it=it)
             if image_grid is not None:
                 logger.add_image('images', image_grid, it)

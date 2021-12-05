@@ -112,12 +112,13 @@ class Generator(nn.Module):
                 return_alpha_map=False,
                 not_render_background=False,
                 only_render_background=False):
+
         #not_render_background=True        
         #only_render_background=True   
+
         if latent_codes is None:
             latent_codes = self.get_latent_codes(batch_size)
 
-        #latent_codes = self.get_w_space(latent_codes)
 
         if camera_matrices is None:
             camera_matrices = self.get_random_camera(batch_size)
@@ -129,12 +130,12 @@ class Generator(nn.Module):
             bg_rotation = self.get_random_bg_rotation(batch_size)
 
         if return_alpha_map:
-            #print('calculating')
+            
             rgb_v, alpha_map = self.volume_render_image(
                 latent_codes, camera_matrices, transformations, bg_rotation,
                 mode=mode, it=it, return_alpha_map=True,
                 not_render_background=not_render_background)
-            #print('will return')
+
             if self.neural_renderer is not None:
                 rgb = self.neural_renderer(rgb_v)
             else:
@@ -145,17 +146,13 @@ class Generator(nn.Module):
                 latent_codes, camera_matrices, transformations, bg_rotation,
                 mode=mode, it=it, not_render_background=not_render_background,
                 only_render_background=only_render_background)
-            #print(rgb_v.shape)
+            
             if self.neural_renderer is not None:
                 rgb = self.neural_renderer(rgb_v)
             else:
                 rgb = rgb_v
-            #print(rgb_v.shape,rgb.shape)
-            return rgb
 
-    def freeze_neural_renderer(self):
-        for param in self.neural_renderer.parameters():
-            param.requires_grad = False
+            return rgb
 
 
     def get_n_boxes(self):

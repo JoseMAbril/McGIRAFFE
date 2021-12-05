@@ -93,7 +93,7 @@ def set_logger(cfg):
 
 
 # Trainer
-def get_trainer(model, optimizer, optimizer_d, cfg, device,DB = 1):
+def get_trainer(model, optimizer, optimizer_d, cfg, device):
     ''' Returns a trainer instance.
 
     Args:
@@ -105,7 +105,7 @@ def get_trainer(model, optimizer, optimizer_d, cfg, device,DB = 1):
     method = cfg['method']
     #set_logger(cfg)
     trainer = method_dict[method].config.get_trainer(
-        model, optimizer, optimizer_d, cfg, device,DB)
+        model, optimizer, optimizer_d, cfg, device)
     return trainer
 
 # Renderer
@@ -134,7 +134,6 @@ def get_dataset(cfg, **kwargs):
     # Get fields with cfg
     dataset_name = cfg['data']['dataset_name']
     dataset_folder = cfg['data']['path']
-    dataset_folder2 = cfg['data']['path2']
     categories = cfg['data']['classes']
     img_size = cfg['data']['img_size']
 
@@ -150,10 +149,4 @@ def get_dataset(cfg, **kwargs):
             celebA_center_crop=cfg['data']['celebA_center_crop'],
             random_crop=cfg['data']['random_crop'],
         )
-        dataset2 = data.ImagesDataset(
-            dataset_folder2, size=img_size,
-            use_tanh_range=cfg['data']['use_tanh_range'],
-            celebA_center_crop=cfg['data']['celebA_center_crop'],
-            random_crop=cfg['data']['random_crop'],
-        )
-    return [dataset1,dataset2]
+    return dataset1

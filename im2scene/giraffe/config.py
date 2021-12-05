@@ -76,7 +76,7 @@ def get_model(cfg, device=None, len_dataset=0, **kwargs):
     return model
 
 
-def get_trainer(model, optimizer, optimizer_d, cfg, device, DB, **kwargs):
+def get_trainer(model, optimizer, optimizer_d, cfg, device, **kwargs):
     ''' Returns the trainer object.
 
     Args:
@@ -96,20 +96,12 @@ def get_trainer(model, optimizer, optimizer_d, cfg, device, DB, **kwargs):
     fid_file = cfg['data']['fid_file']
     assert(fid_file is not None)
     fid_dict = np.load(fid_file)
-    if DB == 1:
-        trainer = training.Trainer(
-            model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
-            overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
-            fid_dict=fid_dict,
-            n_eval_iterations=n_eval_iterations,
-        )
-    else: 
-        trainer = training.Trainer2(
-            model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
-            overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
-            fid_dict=fid_dict,
-            n_eval_iterations=n_eval_iterations,
-        )
+    trainer = training.Trainer(
+        model, optimizer, optimizer_d, device=device, vis_dir=vis_dir,
+        overwrite_visualization=overwrite_visualization, multi_gpu=multi_gpu,
+        fid_dict=fid_dict,
+        n_eval_iterations=n_eval_iterations,
+    )
 
     return trainer
 
