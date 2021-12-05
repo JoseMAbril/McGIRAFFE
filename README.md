@@ -99,7 +99,7 @@ where you replace `OUTPUT_DIR` with the respective output directory. For availab
 For convinience, we have implemented a 2D-GAN baseline which closely follows this [GAN_stability repo](https://github.com/LMescheder/GAN_stability). For example, you can train a 2D-GAN on CompCars at 64x64 pixels similar to our GIRAFFE method by running
 ```
 python train.py configs/64res/cars_64_2dgan.yaml
-``
+```
 ## Evaluating Generated Images
 
 We provide the script `eval_files.py` for evaluating the FID score of your own generated images.
