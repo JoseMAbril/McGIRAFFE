@@ -7,5 +7,10 @@ out
 *.o
 *.swp
 *.prof
+*.png
+*.jpg
+*.mp4
+./out
+*.zip
 .nfs*
 _cache_*

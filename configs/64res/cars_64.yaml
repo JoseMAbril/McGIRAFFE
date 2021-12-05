@@ -1,5 +1,6 @@
 data:
   path: data/comprehensive_cars/images/*.jpg
+  path2: data/carla/*.png
   fid_file: data/comprehensive_cars/fid_files/comprehensiveCars_64.npz
   random_crop: True
 model:
@@ -12,4 +13,4 @@ model:
     range_v: [0.41667, 0.5]
     fov: 10
 training:
-  out_dir:  out/cars64
+  out_dir:  out/cars64(L1Parts2Adv-AdvParts)

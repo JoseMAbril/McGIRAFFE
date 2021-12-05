@@ -29,10 +29,10 @@ model:
     skips: []
 training:
   out_dir:  out/00
-  batch_size: 32
-  print_every: 10
+  batch_size: 16
+  print_every: 100
   checkpoint_every: 500
-  visualize_every: 1000
+  visualize_every: 1
   validate_every: 10000
   backup_every: 1000000
   learning_rate: 0.0005
@@ -42,14 +42,14 @@ training:
   n_workers: 8
   logfile: train.log
   overwrite_visualization: False
-  multi_gpu: false
+  multi_gpu: True
   optimizer: RMSprop
   optimizer_kwargs: {}
   n_eval_images: 10000
 test:
-  model_file: model_best.pt
+  model_file: model.pt
   n_images: 20000
   take_generator_average: True
 rendering:
   render_dir: rendering
-  render_program: ['object_translation_vertical', 'object_translation_horizontal', 'object_rotation', 'interpolate_app', 'interpolate_shape', 'interpolate_app_bg']
+  render_program: ['object_rotation','render_add_cars']

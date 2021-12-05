@@ -12,6 +12,8 @@ from math import ceil
 from torchvision.utils import save_image, make_grid
 
 
+
+
 parser = argparse.ArgumentParser(
     description='Evaluate a GIRAFFE model.'
 )
