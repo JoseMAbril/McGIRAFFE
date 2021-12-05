@@ -229,3 +229,76 @@ class Trainer(BaseTrainer):
         save_image(image_grid, os.path.join(self.vis_dir, out_file_name))
         return image_grid,os.path.join(self.vis_dir, out_file_name)
 
+
+    def visualizeTest(self, it=0):
+        ''' Visualized the data.
+
+        Args:
+            it (int): training iteration
+        '''
+        gen = self.model.generator_test
+        if gen is None:
+            gen = self.model.generator
+        
+        gen.eval()
+        '''
+        with torch.no_grad():
+            image_fake = self.generator(**self.vis_dict, mode='val').cpu()
+        '''
+        generator = self.generator
+        latents = generator.module.get_vis_dict(batch_size=16)
+        x_fake, mask = generator(**latents,return_alpha_map=True,not_render_background=False)
+        mask = self.mask_up(mask)
+        x_fake_no_bg = generator(**latents,not_render_background=True)
+        x_fake_bg = generator(**latents,only_render_background=True)
+        x_fake_parts = x_fake_no_bg*mask+(1-mask)*x_fake_bg
+        mask = torch.cat([mask,mask,mask],1)
+        
+    
+        if self.overwrite_visualization:
+            out_file_name = 'test/Parts.png' 
+        else:
+            out_file_name = 'test/Parts.png'
+        image_fake = torch.cat([x_fake[:4].cpu(),mask[:4].cpu(),x_fake_no_bg.cpu()[:4],x_fake_parts.cpu()[:4],],0)
+        
+        
+        image_grid = make_grid(image_fake.clamp_(0., 1.), nrow=4)
+        save_image(image_grid, os.path.join('.', out_file_name))
+        return image_grid,os.path.join('.', out_file_name)
+
+
+    def visualizeDemo(self, it=0):
+        ''' Visualized the data.
+
+        Args:
+            it (int): training iteration
+        '''
+        gen = self.model.generator_test
+        if gen is None:
+            gen = self.model.generator
+        
+        gen.eval()
+        '''
+        with torch.no_grad():
+            image_fake = self.generator(**self.vis_dict, mode='val').cpu()
+        '''
+        generator = self.generator
+        latents = generator.module.get_vis_dict(batch_size=1)
+        x_fake, mask = generator(**latents,return_alpha_map=True,not_render_background=False)
+        mask = self.mask_up(mask)
+        x_fake_no_bg = generator(**latents,not_render_background=True)
+        x_fake_bg = generator(**latents,only_render_background=True)
+        x_fake_parts = x_fake_no_bg*mask+(1-mask)*x_fake_bg
+        mask = torch.cat([mask,mask,mask],1)
+        
+    
+        if self.overwrite_visualization:
+            out_file_name = 'demo/Parts.png' 
+        else:
+            out_file_name = 'demo/Parts.png'
+        image_fake = torch.cat([x_fake[:1].cpu(),mask[:1].cpu(),x_fake_no_bg.cpu()[:1],x_fake_parts.cpu()[:1],],0)
+        
+        
+        image_grid = make_grid(image_fake.clamp_(0., 1.), nrow=4)
+        save_image(image_grid, os.path.join('.', out_file_name))
+        return image_grid,os.path.join('.', out_file_name),latents['latent_codes']

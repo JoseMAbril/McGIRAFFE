@@ -12,4 +12,4 @@ model:
     range_v: [0.41667, 0.5]
     fov: 10
 training:
-  out_dir:  out/cars64(L1Parts2Adv(xyz))
+  out_dir:  out/FinalModel
