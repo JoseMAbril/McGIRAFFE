@@ -99,23 +99,7 @@ where you replace `OUTPUT_DIR` with the respective output directory. For availab
 For convinience, we have implemented a 2D-GAN baseline which closely follows this [GAN_stability repo](https://github.com/LMescheder/GAN_stability). For example, you can train a 2D-GAN on CompCars at 64x64 pixels similar to our GIRAFFE method by running
 ```
 python train.py configs/64res/cars_64_2dgan.yaml
-```
-
-## Using Your Own Dataset
-
-If you want to train a model on a new dataset, you first need to generate ground truth activations for the intermediate or final FID calculations.
-For this, you can use the script in `scripts/calc_fid/precalc_fid.py`.
-For example, if you want to generate an FID file for the comprehensive cars dataset at 64x64 pixels, you need to run
-```
-python scripts/precalc_fid.py  "data/comprehensive_cars/images/*.jpg" --regex True --gpu 0 --out-file "data/comprehensive_cars/fid_files/comprehensiveCars_64.npz" --img-size 64
-```
-or for LSUN churches, you need to run
-```
-python scripts/precalc_fid.py path/to/LSUN --class-name scene_categories/church_outdoor_train_lmdb --lsun True --gpu 0 --out-file data/church/fid_files/church_64.npz --img-size 64
-```
-
-Note: We apply the same transformations to the ground truth images for this FID calculation as we do during training. If you want to use your own dataset, you need to adjust the image transformations in the script accordingly. Further, you might need to adjust the object-level and camera transformations to your dataset. 
-
+``
 ## Evaluating Generated Images
 
 We provide the script `eval_files.py` for evaluating the FID score of your own generated images.
@@ -124,24 +108,17 @@ For example, if you would like to evaluate your images on CompCars at 64x64 pixe
 python eval_files.py --input-file "path/to/your/images.npy" --gt-file "data/comprehensive_cars/fid_files/comprehensiveCars_64.npz"
 ```
 
-# Futher Information
-
-## More Work on Implicit Representations
-If you like the GIRAFFE project, please check out related works on neural representions from our group:
-- [Schwarz et. al. - GRAF: Generative Radiance Fields for 3D-Aware Image Synthesis (NeurIPS'20)](https://github.com/autonomousvision/graf)
-- [Niemeyer et. al. - DVR: Learning Implicit 3D Representations without 3D Supervision (CVPR'20)](https://github.com/autonomousvision/differentiable_volumetric_rendering)
-- [Oechsle et. al. - Learning Implicit Surface Light Fields (3DV'20)](https://arxiv.org/abs/2003.12406)
-- [Peng et. al. - Convolutional Occupancy Networks (ECCV'20)](https://arxiv.org/abs/2003.04618)
-- [Niemeyer et. al. - Occupancy Flow: 4D Reconstruction by Learning Particle Dynamics (ICCV'19)](https://avg.is.tuebingen.mpg.de/publications/niemeyer2019iccv)
-- [Oechsle et. al. - Texture Fields: Learning Texture Representations in Function Space (ICCV'19)](https://avg.is.tuebingen.mpg.de/publications/oechsle2019iccv)
-- [Mescheder et. al. - Occupancy Networks: Learning 3D Reconstruction in Function Space (CVPR'19)](https://avg.is.tuebingen.mpg.de/publications/occupancy-networks)
-
 
 # ROG for lung tumor segmentation
 
-This code is based on the original GIRAFFE implementation made by Niemeyer and Geiger [Here](https://m-niemeyer.github.io/project-pages/giraffe/index.html)
+This code is based on the original GIRAFFE implementation made by Niemeyer and Geiger [Here](https://github.com/autonomousvision/giraffe)
 
-## Softlinks into the BCV002 machine
+## Preparation of the DB and models
+
+To allow the repository to succesfully run the databases and models must be added. This are the lines that must be runed:
+###BCV002
+
+###BCV003
 
 These softlinks already are created but are mentionned if needed:
 
