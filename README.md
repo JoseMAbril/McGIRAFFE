@@ -135,3 +135,55 @@ If you like the GIRAFFE project, please check out related works on neural repres
 - [Niemeyer et. al. - Occupancy Flow: 4D Reconstruction by Learning Particle Dynamics (ICCV'19)](https://avg.is.tuebingen.mpg.de/publications/niemeyer2019iccv)
 - [Oechsle et. al. - Texture Fields: Learning Texture Representations in Function Space (ICCV'19)](https://avg.is.tuebingen.mpg.de/publications/oechsle2019iccv)
 - [Mescheder et. al. - Occupancy Networks: Learning 3D Reconstruction in Function Space (CVPR'19)](https://avg.is.tuebingen.mpg.de/publications/occupancy-networks)
+
+
+# ROG for lung tumor segmentation
+
+This code is based on the original GIRAFFE implementation made by Niemeyer and Geiger [Here](https://m-niemeyer.github.io/project-pages/giraffe/index.html)
+
+## Softlinks into the BCV002 machine
+
+These softlinks already are created but are mentionned if needed:
+
+The final models for the proposed architecture with the proposed training methodology must been placed inside the principal directory:
+
+>/media/disk0/Datasets_FP/Abril_Escallon/FinalNetwork
+
+Inside the Tasks/Task06_Lung directory:
+
+>/media/disk0/Datasets_FP/Abril_Escallon/Task06_Lung/imagesTr/
+
+>/media/disk0/Datasets_FP/Abril_Escallon/Task06_Lung/imagesTs/
+
+>/media/disk0/Datasets_FP/Abril_Escallon/Task06_Lung/labelsTr/
+
+## Running the proposed network
+
+In order to be sure that one have installed all the libraries required, if runned on the BCV002 machine at Universidad de los Andes, one could use one of our conda environments:
+
+>conda activate "/media/user_home0/jmabril/anaconda3/envs/red2/"
+
+Once the required libraries are installed or the conda environment is activated the main.py code can be run for one of three functionalities: 'train', 'test' or 'demo'. To any of the three modes one can add the parameter "--gpu #" to specify the gpu in which it will be executed. Also, if parallel processes must be created an aditional parameter must be implemented as "--port #" changing the number for each process.
+
+### Train
+
+To train an architecture the comand must be as follow were the # has to be replaced with the number of the desired fold, from 0 to 3:
+
+>python main.py --mode train --fold #
+
+### Test
+
+To test the method the following command must be runed. This command creates a new directory named test, on this directory a csv file will be created with the metrics of each volume and the mean metrics. Also a new folder named "volumes" inside test directory will be created that contains the prediction on the volumes.
+
+>python main.py --mode test
+
+### Demo
+
+To perform the demo the following comand must be executed. This comand will print the metrics of the volume used, also it will create a new folder named "demo" in wich it will save the volume prediction.
+
+>python main.py --mode demo --img 'name.nii.gz'
+...
+
+For this, one of the test images can be used:
+
+    'lung_003.nii.gz', 'lung_009.nii.gz', 'lung_055.nii.gz', 'lung_059.nii.gz', 'lung_079.nii.gz', 'lung_081.nii.gz', 'lung_093.nii.gz'.
