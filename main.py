@@ -202,7 +202,7 @@ if args.mode == 'test':
     np.savez(out_dict_file, **out_dict)
 
     # Save a grid of 16x16 images for visualization
-    save_image(make_grid(img_fake[:256], nrow=16, pad_value=1.), './test')    
+    save_image(make_grid(img_fake[:256], nrow=16, pad_value=1.), 'test/FIDimages.png')    
 
     cfg = config.load_config(args.config, 'configs/default.yaml')
     is_cuda = (torch.cuda.is_available() and not args.no_cuda)
